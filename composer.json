@@ -1,5 +1,5 @@
 {
-    "name": "bilalbaraz/laravelmmer-client",
+    "name": "bilalbaraz/laravel-yammer-client",
     "description": "Yammer API Wrapper for Laravel",
     "type": "library",
     "authors": [
