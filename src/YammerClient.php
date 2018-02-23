@@ -34,14 +34,45 @@ class YammerClient
         ]
       ]);
 
-      $this->content = json_decode($this->body->getBody(), TRUE)['messages'];
+      $this->body = $this->_jsonToArray($this->body->getBody());
+      $this->content = $this->getBody('messages');
 
       return $this;
   }
 
+  public function getMessagesByGroupId($groupId = null, $options = [])
+  {
+      if (is_null($groupId)) {
+        throw new \Exception( __FUNCTION__ . " expects a group ID", 200);
+      }
+
+      $this->body = $this->httpClient->request(
+        'GET',
+        $this->_getFullUrl().'/messages/in_group/' . $groupId . '.json?' . http_build_query($options), [
+        'headers' => [
+          'Authorization' => 'Bearer ' . $this->token
+        ]
+      ]);
+
+      $this->body = $this->_jsonToArray($this->body->getBody());
+      $this->content = $this->getBody('messages');
+      return $this;
+  }
+
+  public function getBody($key = '', $type = null)
+  {
+      $result = $dataset = $this->body[$key];
+
+      if (!is_null($type)) {
+          $result = $this->_search($type, 'type', $dataset);
+      }
+
+      return $result;
+  }
+
   public function withUsers()
   {
-      $references = json_decode($this->body->getBody(), TRUE)['references'];
+      $references = $this->getBody('references', 'user');
 
       $users = array_filter($references, function($item) {
           return $item['type'] == 'user';
@@ -109,13 +140,27 @@ class YammerClient
       return self::API_URL.self::VERSION;
   }
 
+  private function _jsonToArray($dataset)
+  {
+    return json_decode($dataset, TRUE);
+  }
+
   private function _search($find = '', $column = '', $dataset = [])
   {
+      $result = [];
+
       foreach ($dataset as $key => $data) {
           if ($data[$column] == $find) {
-              return $data;
+              array_push($result, $data);
           }
       }
-      return null;
+
+      if(count($result) > 1){
+          return $result;
+      }else if (count($result) == 1) {
+          return current($result);
+      }else {
+          return null;
+      }
   }
 }
