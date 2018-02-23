@@ -70,6 +70,13 @@ class YammerClient
       return $result;
   }
 
+  public function reverse()
+  {
+      $this->content = array_reverse($this->content);
+      
+      return $this;
+  }
+
   public function withUsers()
   {
       $references = $this->getBody('references', 'user');
