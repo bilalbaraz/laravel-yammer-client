@@ -73,17 +73,13 @@ class YammerClient
   public function reverse()
   {
       $this->content = array_reverse($this->content);
-      
+
       return $this;
   }
 
   public function withUsers()
   {
-      $references = $this->getBody('references', 'user');
-
-      $users = array_filter($references, function($item) {
-          return $item['type'] == 'user';
-      });
+      $users = $this->getBody('references', 'user');
 
       $this->content = array_map(function($message) use ($users) {
 
