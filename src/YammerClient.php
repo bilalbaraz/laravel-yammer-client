@@ -59,6 +59,24 @@ class YammerClient
       return $this;
   }
 
+  public function getUsers($userId = null)
+  {
+      $target = $this->_getFullUrl() . '/users';
+
+      $target .= is_null($userId) ? '.json' : '/' . $userId . '.json';
+
+      $response = $this->httpClient->request(
+        'GET',
+        $target, [
+        'headers' => [
+          'Authorization' => 'Bearer ' . $this->token
+        ]
+      ]);
+
+      $response = $this->_jsonToArray($response->getBody());
+      return $response;
+  }
+
   public function getBody($key = '', $type = null)
   {
       $result = $dataset = $this->body[$key];
@@ -83,17 +101,17 @@ class YammerClient
 
       $this->content = array_map(function($message) use ($users) {
 
-          $message['user'] = $this->_search($message['sender_id'], 'id', $users);
+          $message['user'] = $this->_search($message['sender_id'], 'id', $users, 'first');
 
           if ($message['liked_by']['count'] > 0) {
               foreach ($message['liked_by']['names'] as $likeKey => $name) {
-                  $message['liked_by']['names'][$likeKey]['user'] = $this->_search($name['user_id'], 'id', $users);
+                  $message['liked_by']['names'][$likeKey]['user'] = $this->_search($name['user_id'], 'id', $users, 'first');
               }
           }
 
           if (count($message['notified_user_ids']) > 0) {
             foreach ($message['notified_user_ids'] as $notifyKey => $notifiedUserId) {
-                $message['notified_user_ids'][$notifyKey] = $this->_search($notifiedUserId, 'id', $users);
+                $message['notified_user_ids'][$notifyKey] = $this->_search($notifiedUserId, 'id', $users, 'first');
             }
           }
 
@@ -148,7 +166,7 @@ class YammerClient
     return json_decode($dataset, TRUE);
   }
 
-  private function _search($find = '', $column = '', $dataset = [])
+  private function _search($find = '', $column = '', $dataset = [], $option = '')
   {
       $result = [];
 
@@ -158,10 +176,15 @@ class YammerClient
           }
       }
 
-      if(count($result) > 1){
-          return $result;
-      }else if (count($result) == 1) {
-          return current($result);
+      if(!empty($result)){
+          if ($option == 'first') {
+              return current($result);
+          }else if ($option == 'last') {
+              return end($result);
+          }else {
+              return $result;
+          }
+
       }else {
           return null;
       }
