@@ -1,6 +1,6 @@
 # Yammer API Wrapper For Laravel
 
-[![Build Status](https://travis-ci.org/bilalbaraz/laravel-yammer-client.svg?branch=master)](https://travis-ci.org/bilalbaraz/laravel-yammer-client)
+[![Build Status](https://travis-ci.org/bilalbaraz/laravel-yammer-client.svg?branch=master)](https://travis-ci.org/bilalbaraz/laravel-yammer-client) [![Dependency Status](https://beta.gemnasium.com/badges/github.com/bilalbaraz/laravel-yammer-client.svg)](https://beta.gemnasium.com/projects/github.com/bilalbaraz/laravel-yammer-client)
 
 ## Installation
 
